@@ -38,10 +38,10 @@ A: In modern C++, it is fine for structs to have member functions. This excludes
 Def (keyw: "setup"):
 A constructor is a special member function that is automatically called after a non-aggregate
     class type object is created. It prevents the creation if no existent matching creator.
-Constructors must have the same name as the class (with the same capitalization).
+* Constructors must have the same name as the class (with the same capitalization).
     For template classes, this name excludes the template parameters.
-Constructors have no return type (not even void).
-Because constructors are typically part of the interface for your class, they are usually public.
+* Constructors have no return type (not even void).
+* Because constructors are typically part of the interface for your class, they are usually public.
 
 - initialize members variables, and do any other set up tasks required to ensure objects of the class are ready for use.
     (legally, compulsively, sufficiently, keep class invariant)
@@ -52,6 +52,12 @@ Because constructors are typically part of the interface for your class, they ar
 Q: aggreagte vs non-aggreagte class type
 A: 1. aggreagte take no private member (invalid), so non-aggreagte (class), no longer able to use
     aggreagte-initialization.
+
+[??.?] *this*
+
+[??.?] *new*
+
+[??.?] -foreach-
 
 
 [15.4] Distructor!
@@ -70,9 +76,9 @@ up is called prior to the object being destroyed, we are likely to run into erro
 Distructor is called automatically when an object of a non-aggregate class type is destroyed,
 designed to allow a class to do any necessary clean up before an object of the class is destroyed.
 
-The destructor must have the same name as the class, preceded by a tilde (~).
-The destructor can not take arguments.
-The destructor has no return type.
+* The destructor must have the same name as the class, preceded by a tilde (~).
+* The destructor can not take arguments.
+* The destructor has no return type.
 
 - Unhandled exceptions will also cause the program to terminate, and may not unwind the stack before doing so.
 If stack unwinding does not happen, destructors will not be called prior to the termination of the program.
