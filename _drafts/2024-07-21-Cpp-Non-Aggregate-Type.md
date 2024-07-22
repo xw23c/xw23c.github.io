@@ -1,14 +1,8 @@
 
-[5.1] Const
+[Statement] Archive notes series reading through LearnCpp.Com, an insightful source, very worth reading
+            and freely accessible to everyone anonymously. Thanks to Alex.
 
-- Making a function parameter constant enlists the compiler’s help to ensure that the parameter’s
-value is not changed inside the function. However, in modern C++ we don’t make value parameters
-const because we generally don’t care if the function changes the value of the parameter
-(since it’s just a copy that will be destroyed at the end of the function anyway).
-The const keyword also adds a small amount of unnecessary clutter to the function prototype.
 
-- Don’t use const when passing by value / returning by value
-- Prefer constant variables over object-like macros with substitution text.
 
 
 
@@ -30,7 +24,7 @@ A: In modern C++, it is fine for structs to have member functions. This excludes
     which are a special type of member function that we cover in upcoming lesson 14.9
     -- Introduction to constructors. A class type with a constructor is no longer an aggregate,
     and we want our structs to remain aggregates.
-    -- keyword: **aggreagte**
+    -- keyword: **aggregate**
 
 
 [14.9] Class constructor!
@@ -53,7 +47,22 @@ Q: aggreagte vs non-aggreagte class type
 A: 1. aggreagte take no private member (invalid), so non-aggreagte (class), no longer able to use
     aggreagte-initialization.
 
-[??.?] *this*
+[15.1] Hidden pointer *this*
+
+Def:
+Inside every member function, the keyword this is a const pointer that holds the address of the current implicit object.
+
+- All non-static member functions/variables have a *this* const pointer that holds the address of the implicit object.
+- Because this is just a function parameter (and not a member), it does not make instances of your class larger memory-wise.
+- Explicit usecase:
+    1. (distinguash class member variable wrt function local variable) First, if you have a member function that has a parameter with the same name as a data member, you can disambiguate them by using this
+    2. (method chaining) Second, it can sometimes be useful to have a member function return the implicit object as a return value. The primary reason to do this is to allow member functions to be “chained” together, so several member functions can be called on the same object in a single expression! This is called function chaining (or method chaining).
+    3. (class reset) If your class has a default constructor, you may be interested in providing a way to return an existing object back to its default state.
+
+- For non-const member functions, *this* is a const pointer to a non-const value (meaning this cannot be pointed at something else, but the object pointing to may be modified). With const member functions, *this* is a const pointer to a const value (meaning the pointer cannot be pointed at something else, nor may the object being pointed to be modified). Errors got generated from attempting to call a non-const member on a const object.
+
+- *this* defined as a pointer, not a reference. In other more modern C++-like languages, such as Java and C#, this is implemented as a reference.
+
 
 [??.?] *new*
 
