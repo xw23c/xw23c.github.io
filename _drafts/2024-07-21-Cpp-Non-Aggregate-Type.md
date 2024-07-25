@@ -64,7 +64,8 @@ Inside every member function, the keyword this is a const pointer that holds the
 - *this* defined as a pointer, not a reference. In other more modern C++-like languages, such as Java and C#, this is implemented as a reference.
 
 
-[??.?] *new*
+[??.?] *private slot*
+
 
 [??.?] -foreach-
 
