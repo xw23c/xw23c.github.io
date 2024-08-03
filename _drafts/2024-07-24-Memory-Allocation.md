@@ -70,4 +70,17 @@ ptr = new int{}; // old address lost, memory leak results
 
 
 
+[19.2]
+
+*Dynamically allocate arrays*
+
+- Unlike a fixed array, where the array size must be fixed at compile time, dynamically allocating an array allows us to choose an array length at runtime (meaning our length does not need to be constexpr).
+
+
+*delete[]*
+
+- One often asked question of array delete[] is, “How does array delete know how much memory to delete?” The answer is that array new[] keeps track of how much memory was allocated to a variable, so that array delete[] can delete the proper amount. Unfortunately, this size/length isn’t accessible to the programmer.
+
+
+
 

@@ -20,3 +20,12 @@ The const keyword also adds a small amount of unnecessary clutter to the functio
 
 
 *const object and this* (15.1) : const member function ?
+
+
+
+[**,*] *typedef* and *#define*
+
+Both of them are used to define symbol alais, whereas below difference exists:
+- typedef suits only for TYPE alias, while #define also suits NUMBER
+- typedef interpreted by compiler while #define interpreted by pre-processor
+
