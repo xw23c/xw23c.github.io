@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"> <html><body> <h2 id="overview-">Overview <sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup> </h2> <p>There are two types of concurrent programming model: multi-processing and multi-threading. Comparing to multi-processing, the multi-threading characterize:</p> <ul> <li>Pros <ul> <li>fast to start</li> <li>low overhead</li> </ul> </li> <li>Cons <ul> <li>difficult to implement</li> <li>cannot run on distributed system</li> </ul> </li> </ul> <p>Example code of threading:</p> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td> <td class="rouge-code"><pre><span class="cp">#include</span><span class="cpf">&lt;iostream&gt;</span><span class="cp">
+#include</span><span class="cpf">&lt;thread&gt;</span><span class="cp">
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">function_1</span><span class="p">(){</span> <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">"Reality is merely an illusion, albeit a very persistent one."</span> <span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t</span><span class="p">(</span><span class="n">function_1</span><span class="p">);</span> <span class="c1">// t starts running</span>
+	<span class="c1">// t.join(); // main thread waits for thread t to finish</span>
+	<span class="n">t</span><span class="p">.</span><span class="n">detach</span><span class="p">();</span>	<span class="c1">// t goes freely on its own -- daemon process</span>
+
+	<span class="cm">/* join or detach can only operated once
+	 cannot join anymore once get detach */</span>
+
+	<span class="c1">// check if joinable</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">joinable</span><span class="p">())</span> <span class="n">t</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <h2 id="thread-management-">Thread management <sup id="fnref:2" role="doc-noteref"><a href="#fn:2" class="footnote" rel="footnote">2</a></sup> </h2> <h3 id="try-catch-block">Try-Catch block</h3> <p>Child thread destroyed (eg. thread goes out of scope) before <code class="language-plaintext highlighter-rouge">.join/.detach</code> , the program then terminates. This can be caused by exceptions from the parent thread. To avoid this problem, one solution is to use try-catch block.</p> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+</pre></td> <td class="rouge-code"><pre><span class="kt">void</span> <span class="nf">function_1</span><span class="p">(){</span> <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">"Reality is merely an illusion, albeit a very persistent one."</span> <span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;};</span>
+
+<span class="kt">void</span> <span class="nf">parent_thread_works</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"from main: "</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t</span><span class="p">(</span><span class="n">function_1</span><span class="p">);</span> <span class="c1">// t starts running</span>
+
+	<span class="cm">/* Use try-catch to wrap up the parent thread`s work.
+	This will ensure the child thread to be joined w/wo
+	exceptions */</span>
+	<span class="k">try</span> <span class="p">{</span>
+		<span class="n">parent_thread_works</span><span class="p">();</span>
+	<span class="p">}</span> <span class="k">catch</span> <span class="p">(...)</span> <span class="p">{</span>  <span class="c1">// catch any exceptions</span>
+		<span class="n">t</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+		<span class="k">throw</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="cm">/* Another way is to use RAII, create wrapper class w(t)
+	whoes destructor will join t automatically*/</span>
+
+	<span class="n">t</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <h3 id="pass-by-reference">Pass by reference</h3> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td> <td class="rouge-code"><pre><span class="k">class</span> <span class="nc">Fctor</span> <span class="p">{</span>
+<span class="nl">public:</span>
+	<span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"t says: "</span> <span class="o">&lt;&lt;</span> <span class="n">msg</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">string</span> <span class="n">s</span> <span class="o">=</span> <span class="s">"Reality is merely an illusion, albeit a very persistent one."</span><span class="p">;</span>
+
+	<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"ID of main thread"</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">get_id</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+	<span class="c1">// another pair of parathesis added to explicily declare Fctor()</span>
+	<span class="c1">// constructed as a functor</span>
+	<span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t</span><span class="p">((</span><span class="n">Fctor</span><span class="p">()),</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">s</span><span class="p">));</span>
+
+	<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"ID of child thread: "</span> <span class="o">&lt;&lt;</span> <span class="n">t</span><span class="p">.</span><span class="n">get_id</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+	<span class="n">t</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+
+	<span class="c1">// child and parent thread sharing the same memory, ie. the string s</span>
+	<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"from main: "</span> <span class="o">&lt;&lt;</span> <span class="n">s</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <p>As in above example, though we have <code class="language-plaintext highlighter-rouge">string&amp; msg</code> in declaration, the <code class="language-plaintext highlighter-rouge">thread()</code> constructor will still take in value. So it still keeps as passing by value. To force using pass by reference, we use</p> <blockquote> <p><code class="language-plaintext highlighter-rouge">std::ref(s) // Create a reference wrapper</code></p> </blockquote> <h3 id="pass-by-pointer">Pass by pointer</h3> <p>Note in the example, parent and child share the same memory, the string <em>s</em>. Suppose we don’t prefer this way, since memory sharing causes data racing problem. And we don’t prefer to pass data by value. In such case we can pass parameter use the <code class="language-plaintext highlighter-rouge">move()</code> function</p> <blockquote> <p><code class="language-plaintext highlighter-rouge">std::move(s) // move the string s from the main thread to the child thread</code> In Cpp there many things can only be moved and cannot be copied, such as the thread object ```cpp int main() { string s = “Reality is merely an illusion, albeit a very persistent one.”;</p> </blockquote> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td> <td class="rouge-code"><pre>std::thread t((Fctor()), std::move(s));
+
+//std::thread t2 = t; // cannot compile
+std::thread t2 = std::move(t);
+
+t2.join();
+
+return 0; } ```
+</pre></td> </tr></tbody></table></code></pre></div></div> <h3 id="identification">Identification</h3> <p>Following functions can be used to display the thread id</p> <blockquote> <p><code class="language-plaintext highlighter-rouge">std::this_thread::get_id() // id of current thread</code> <code class="language-plaintext highlighter-rouge">thread_t.get_id() // id of thread t</code></p> </blockquote> <h3 id="oversubscription">Oversubscription</h3> <p>Ideally we create number of threads as many as the number of cores we have. To run more threads than hardware support is called <em>oversubscription</em>, which will create lots of contact switching and decrease the performance. The library provides function that give indication how many threads should be truly used for concurrency:</p> <blockquote> <p><code class="language-plaintext highlighter-rouge">std::thread::hardware_concurrency()</code></p> </blockquote> <h2 id="reference">Reference</h2> <hr> <div class="footnotes" role="doc-endnotes"> <ol> <li id="fn:1" role="doc-endnote"> <p><a href="https://www.youtube.com/watch?v=LL8wkskDlbs&amp;list=PL5jc9xFGsL8E12so1wlMS0r0hTQoJL74M" rel="external nofollow noopener" target="_blank">C++ Threading #1: Introduction</a> <a href="#fnref:1" class="reversefootnote" role="doc-backlink">↩</a></p> </li> <li id="fn:2" role="doc-endnote"> <p><a href="https://www.youtube.com/watch?v=f2nMqNj7vxE&amp;list=PL5jc9xFGsL8E12so1wlMS0r0hTQoJL74M&amp;index=3" rel="external nofollow noopener" target="_blank">C++ Threading #2: Thread Management</a> <a href="#fnref:2" class="reversefootnote" role="doc-backlink">↩</a></p> </li> </ol> </div> </body></html>
