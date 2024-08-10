@@ -15,11 +15,19 @@ The order of elements is not defined and it changes over the time. Internally th
 > Fast and effective hash function can guarantee fast search time (constant)
 {: .block-tip }
 
-![](Screenshot%202024-08-08%20at%2020.59.36.png)
-*Figure 1. Internal structure of unordered sets and multisets* [^1]
-![](Screenshot%202024-08-08%20at%2021.00.07.png)
-*Figure 2. Internal structure of unordered maps and multimaps* [^1]
 
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/unorderedset.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+    </div>
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/unorderedmap.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+    </div>
+</div>
+
+<div class="caption">
+    *Figure 1. Internal structure of unordered sets/multisets(left) and map/multimaps(right)* [^1]
+</div>
 
 
 | unordered accos. containers | header           | RA    | dup.   | feature               | Impl.      |
@@ -96,7 +104,7 @@ using namespace std;
 void foo(const unordered_map<char,  string>& m);
 
 int main() {
-    unordered_map<char, string> day{{'S', "Sunday"}, {'M', "Monday"}};
+    unordered_map<char, string> day = {{'S', "Sunday"}, {'M', "Monday"}};
 
     cout << day['S'] << endl; // No range check
     cout << day.at('S') << endl; // Has range check
