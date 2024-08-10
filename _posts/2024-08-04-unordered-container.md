@@ -104,7 +104,7 @@ using namespace std;
 void foo(const unordered_map<char,  string>& m);
 
 int main() {
-    unordered_map<char, string> day = {{'S', "Sunday"}, {'M', "Monday"}};
+    unordered_map<char, string> day{{'S', "Sunday"}}; // , {'M', "Monday"}
 
     cout << day['S'] << endl; // No range check
     cout << day.at('S') << endl; // Has range check
