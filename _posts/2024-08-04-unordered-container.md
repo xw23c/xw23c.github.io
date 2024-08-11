@@ -12,6 +12,9 @@ featured: true
 
 ## The containers
 The order of elements is not defined and it changes over the time. Internally they are implemented by hash table (an array of linked list, a.k.a array of buckets, the grey boxes in bellow graph,  and the slots on the linked list also called entries).
+
+> ##### TIP
+>
 > Fast and effective hash function can guarantee fast search time (constant)
 {: .block-tip }
 
@@ -25,23 +28,29 @@ The order of elements is not defined and it changes over the time. Internally th
     </div>
 </div>
 
-<div class="caption">
-    *Figure 1. Internal structure of unordered sets/multisets(left) and map/multimaps(right)* [^1]
-</div>
+*Figure 1. Internal structure of unordered sets/multisets(left) and map/multimaps(right)* [^1]
 
 
-| unordered accos. containers | header           | RA    | dup.   | feature               | Impl.      |
-|-----------------------------|------------------|-------|--------|-----------------------|------------|
-| unordered_set<T>            | <unordered_set>  | false | forbid | value cant be changed | hash table |
-| unordered_multiset<T>       | <unordered_set>  | false | allow  | value cant be changed | hash table |
-| unordered_map<T, T>         | <unordered_map>￼ | false | forbid | key cant be changed   | hash table |
-| unordered_multimap<T, T>    | <unordered_map>￼ | false | allow  | key cant be changed   | hash table |
+
+| unordered accos. containers  |           header          |      RA       |      dup.     |           feature           |        Impl.       |
+| :--------------------------- | :-----------------------: | :-----------: | :-----------: | :-------------------------: | :----------------: |
+| unordered_set\<T>            |     \<unordered_set>      |     false     |     forbid    |    value cant be changed    |     hash table     |
+| unordered_multiset\<T>       |     \<unordered_set>      |     false     |     allow     |    value cant be changed    |     hash table     |
+| unordered_map<T, T>          |     \<unordered_map>￼      |     false     |     forbid    |     key cant be changed     |     hash table     |
+| unordered_multimap<T, T>     |     \<unordered_map>￼      |     false     |     allow     |     key cant be changed     |     hash table     |
+
 
 Note the change of value (value for sets, key for maps) will corrupt the data structure of hash table, thus it is forbidden by definition in nature.
-> Unordered set/multiset: element value cannot be changed
-> Unordered map/multimap: element key cannot be changed
+
+> ##### WARNING
+>
+> Read-only properties:
+> <br>Unordered set/multiset: element value cannot be changed
+> <br>Unordered map/multimap: element key cannot be changed
 {: .block-warning }
 
+> ##### WARNING
+>
 > Multimaps do not promise unique keys, therefore they don’t support subscript operator [-].
 {: .block-warning }
 
@@ -104,7 +113,7 @@ using namespace std;
 void foo(const unordered_map<char,  string>& m);
 
 int main() {
-    unordered_map<char, string> day{{'S', "Sunday"}}; // , {'M', "Monday"}
+    unordered_map<char, string> day{{'S', "Sunday"}};   //, {'M', "Monday"}};
 
     cout << day['S'] << endl; // No range check
     cout << day.at('S') << endl; // Has range check
@@ -115,6 +124,7 @@ int main() {
     day['W'] = "Wednesday";  // Inserting {'W', "wednesday"}
     day.insert(make_pair('F', "Friday"));
 
+    day.insert(make_pair('M', "Monday"));
     day.insert(make_pair('M', "MONDAY")); // fail to modify. For unordered_map, cannot use insert() to modify elements
     day['M'] = "MONDAY";                  // succeed to modify. Subscript operator provide write access to the container
 
@@ -144,18 +154,23 @@ void foo(const unordered_map<char,  string>& m) {
 
 ## Performance [^2]
 
-| *action*                       | *unordered associative containers*  |
-|--------------------------------|-------------------------------------|
-|                                | unordered set/multiset/map/multimap |
-| insert/remove (.insert/.erase) | $$O(1)$$ - amortized constant       |
-| search (.find)                 | $$O(1)$$ - amortized                |
-| traverse                       |                                     |
+
+| *action*                             | *unordered associative containers*     |
+| :----------------------------------- | :------------------------------------- |
+|                                      | unordered set/multiset/map/multimap    |
+| insert/remove (.insert/.erase)       | $$O(1)$$ - amortized constant          |
+| search (.find)                       | $$O(1)$$ - amortized                   |
+| traverse                             | n/a                                    |
+
+
 They possess the **fastest** insert and search time at any place - $$O(1)$$. However, this is **amortized** constant time due to potential rare case of  hash collisions. (*Amortized time* here indicates “average time taken per operation given that the same operation repeats many times”[^3])
 
 ### Hash collision
 This indicate many items are inserted at the same buckets, and majority of them then are only inserted into a few buckets. The performance of searching will degrade from constant time $$O(1)$$ to linear time $$O(n)$$
 
-> Unordered map provides amortized constant time, but it may degrade to linear time, while ordered map can guarantee $$O(log(n)$$ time. This is important for real time system.
+> ##### TIP
+>
+> Unordered map provides amortized constant time, but it may degrade to linear time, while ordered map can guarantee $$O(log(n))$$ time. This is important for real time system.
 {: .block-tip }
 
 
