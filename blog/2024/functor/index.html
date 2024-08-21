@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"> <html><body> <hr> <p>layout: post title: STL Function Object date: 2024-08-20 16:55:00 description: intros to cpp stl functors tags: C++ STL functor categories: tech featured: true —</p> <h2 id="definition">Definition</h2> <p>Functor extends the concept of function by saying anything behave like a function is a function. A functor is a design pattern in programming that represents a function as an object. It is a way to package a function and its associated data into a single unit, allowing the function to be treated as an object. In essence, a functor is an object that: <strong>1</strong> <strong>Wraps a function</strong>: A functor contains a function as a member variable. <strong>2</strong> <strong>Provides a way to apply the function</strong>: A functor provides a way to apply the wrapped function to a set of inputs, often through an apply or call method. <strong>3</strong> <strong>Can be treated as an object</strong>: A functor can be passed around, stored, and manipulated like any other object.</p> <blockquote class="block-tip"> <h5 id="tip">TIP</h5> <p>Functor is a class or struct object that can be called like a function. It overloads the <strong>function-call operator</strong> () and allows us to use an object like a function.</p> </blockquote> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td> <td class="rouge-code"><pre><span class="k">class</span> <span class="nc">X</span> <span class="p">{</span>
+
+<span class="nl">public:</span>
+
+    <span class="n">X</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="p">{}</span>
+
+    <span class="kt">void</span> <span class="nf">operator</span><span class="p">()(</span><span class="n">string</span> <span class="n">str</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Calling functor X with parameter "</span> <span class="o">&lt;&lt;</span> <span class="n">str</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">operator</span> <span class="n">string</span> <span class="p">()</span> <span class="k">const</span> <span class="p">{</span><span class="k">return</span> <span class="s">"X"</span><span class="p">;}</span>  <span class="c1">// type conversion function</span>
+
+<span class="p">};</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td> <td class="rouge-code"><pre>  <span class="n">X</span> <span class="nf">foo</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+  <span class="n">foo</span><span class="p">(</span><span class="s">"Hi!"</span><span class="p">);</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <h2 id="benefits-of-using-functor">Benefits of using functor</h2> <p>As object, functor can provide more things, often used in functional programming to:</p> <ul> <li> <strong>Enable parameterized function</strong>: defining its own member data to remember states such that different function instance can be created</li> <li> <strong>Abstract away low-level details</strong>: Functors can encapsulate complex logic and provide a simple interface to interact with it.</li> <li> <strong>Enable function composition</strong>: Functors can be combined to create more complex functions.</li> <li> <strong>Improve code reuse</strong>: Functors can be reused in different contexts.</li> </ul> <p>Due to those member data, you could have different instance of the same functor that behave different from each other. Regular functions are differentiated and identified by their function signatures. However, two functors can be of different types even if they have the same function signature.</p> <blockquote class="block-tip"> <h5 id="tip-1">TIP</h5> <p>Smart function: capabilities beyond operator() <br>1. Define and record member states <br>2. Possess its own type, enable instantiations</p> </blockquote> <h3 id="parameterized-function">Parameterized Function </h3> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+</pre></td> <td class="rouge-code"><pre><span class="cm">/* Template way to parameterize the function
+*  downside: temporary variable val has to be resolved at compile
+*  time, i.e being a conpile time constant
+*/</span>
+
+
+<span class="k">template</span><span class="o">&lt;</span><span class="kt">int</span> <span class="n">val</span><span class="p">&gt;</span>
+<span class="kt">void</span> <span class="nf">addVal</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">val</span> <span class="o">+</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="cm">/* Use Functor */</span>
+
+<span class="k">class</span> <span class="nc">AddVal</span> <span class="p">{</span>
+
+<span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+
+<span class="nl">public:</span>
+    <span class="n">AddVal</span><span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="p">{}</span>
+    <span class="kt">void</span> <span class="nf">operator</span><span class="p">()(</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">val</span> <span class="o">+</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">};</span>
+
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">};</span>
+
+    <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="c1">// for_each(vec.begin(), vec.end(), addVal&lt;x&gt;); // compile error : x has to be compile time constant</span>
+
+    <span class="n">for_each</span><span class="p">(</span><span class="n">vec</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">vec</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">AddVal</span><span class="p">(</span><span class="n">x</span><span class="p">));</span> <span class="c1">// ok!</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+</pre></td> </tr></tbody></table></code></pre></div></div> <h2 id="built-in-functors-">Built-in functors <sup id="fnref:2" role="doc-noteref"><a href="#fn:2" class="footnote" rel="footnote">1</a></sup> </h2> <p>To use the predefined functors provided by the standard library by including the functional header file <code class="language-plaintext highlighter-rouge">#include &lt;functional&gt;</code></p> <p>C++ provides the following library functors for arithmetic, relational, and logical operations:</p> <ul> <li>Relational Functors: <code class="language-plaintext highlighter-rouge">less, greater, greater_equal, less_equal, not_equal_to</code> </li> <li>Logical Functors: <code class="language-plaintext highlighter-rouge">logical_and, logical_not, logical_or</code> </li> <li>Arithmetic Functors: <code class="language-plaintext highlighter-rouge">multiplies, minus, plus, divide, modulus, negate</code> </li> </ul> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td> <td class="rouge-code"><pre><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">multiplies</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">()(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span> <span class="c1">// x = 3 * 4</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">not_equal_to</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">()(</span><span class="n">x</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="c1">// if (x != 10)</span>
+	<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <p>(Details ref : <sup id="fnref:2:1" role="doc-noteref"><a href="#fn:2" class="footnote" rel="footnote">1</a></sup>)</p> <h2 id="parameter-binding">Parameter Binding </h2> <p>Combine functor with <em>bind</em> function :</p> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td> <td class="rouge-code"><pre><span class="n">bind</span><span class="p">()</span> <span class="c1">// available c++11</span>
+<span class="n">bind1st</span><span class="p">()</span> <span class="c1">// c++03</span>
+<span class="n">bind2nd</span><span class="p">()</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td> <td class="rouge-code"><pre><span class="n">set</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">myset</span><span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">};</span>
+<span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">res</span><span class="p">;</span>
+
+<span class="n">transform</span><span class="p">(</span><span class="n">myset</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">myset</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span>        <span class="c1">// source</span>
+    			<span class="n">back_inserter</span><span class="p">(</span><span class="n">res</span><span class="p">),</span>              <span class="c1">// destination</span>
+    			<span class="c1">//bind2nd(multiplies&lt;int&gt;(),10));       // functor</span>
+    			<span class="n">bind</span><span class="p">(</span><span class="n">multiplies</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span> <span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
+			<span class="c1">// bind() - c++11</span>
+
+<span class="c1">// First element of multiplies is substituted by with myset`s element and second by 10</span>
+<span class="c1">// res: {20,30,40,50}</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <h2 id="functor-composing">Functor composing</h2> <p>Construct composite functors using bind function :</p> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td> <td class="rouge-code"><pre>
+<span class="cm">/*
+*	 when (x &gt; 2) &amp;&amp; (x &lt; 5) , copy from myset to res2_dq
+*/</span>
+
+<span class="n">deque</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">res2_dq</span><span class="p">;</span>
+
+<span class="n">transform</span><span class="p">(</span><span class="n">myset</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">myset</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">back_inserter</span><span class="p">(</span><span class="n">res2_dq</span><span class="p">),</span>
+            <span class="n">bind</span><span class="p">(</span><span class="n">logical_and</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(),</span>
+            <span class="n">bind</span><span class="p">(</span><span class="n">greater</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span> <span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">bind</span><span class="p">(</span><span class="n">less</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span> <span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="p">);</span>
+
+<span class="c1">// c++11 Lambda function</span>
+<span class="n">transform</span><span class="p">(</span><span class="n">myset</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">myset</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">back_inserter</span><span class="p">(</span><span class="n">res2_dq</span><span class="p">),</span>
+            <span class="p">[](</span><span class="kt">int</span> <span class="n">x</span><span class="p">){</span><span class="k">return</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;}</span>
+        <span class="p">);</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <h2 id="function-wrapper-object-">Function wrapper object <sup id="fnref:3" role="doc-noteref"><a href="#fn:3" class="footnote" rel="footnote">2</a></sup> </h2> <p>Convert regular function to functor. Use function class template to do so :</p> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td> <td class="rouge-code"><pre><span class="n">std</span><span class="o">::</span><span class="n">function</span>	<span class="c1">// c++11</span>
+<span class="n">std</span><span class="o">::</span><span class="n">ptr_fun</span>		<span class="c1">// c++03</span>
+</pre></td> </tr></tbody></table></code></pre></div></div> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td> <td class="rouge-code"><pre><span class="n">deque</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">res_dq</span><span class="p">;</span>
+<span class="k">auto</span> <span class="n">f</span> <span class="o">=</span> <span class="n">function</span><span class="o">&lt;</span><span class="kt">double</span> <span class="p">(</span><span class="kt">double</span><span class="p">,</span> <span class="kt">double</span><span class="p">)</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Pow</span><span class="p">);</span>
+
+<span class="n">transform</span><span class="p">(</span><span class="n">myset</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">myset</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">back_inserter</span><span class="p">(</span><span class="n">res_dq</span><span class="p">),</span>
+    <span class="n">bind</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">));</span>
+
+</pre></td> </tr></tbody></table></code></pre></div></div> <p>(Details ref: <sup id="fnref:3:1" role="doc-noteref"><a href="#fn:3" class="footnote" rel="footnote">2</a></sup>)</p> <h2 id="relational-functor-in-stl">Relational functor in STL</h2> <p>Ordered containers in STL are templates classes that initialized with relational functors, which are used for elements ordering. Default relational functor were usually set as <code class="language-plaintext highlighter-rouge">less</code>. On purpose of use case, we can customize this relational functor.</p> <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr>
+<td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td> <td class="rouge-code"><pre><span class="k">class</span> <span class="nc">Lsb_less</span> <span class="p">{</span>
+    <span class="nl">public:</span>
+    <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="o">%</span><span class="mi">10</span><span class="p">)</span><span class="o">&lt;</span><span class="p">(</span><span class="n">b</span><span class="o">%</span><span class="mi">10</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+ <span class="n">set</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">Lsb_less</span><span class="o">&gt;</span> <span class="n">myset2</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">};</span> <span class="c1">// myset2 : {1,12,3,25,7}</span>
+
+</pre></td> </tr></tbody></table></code></pre></div></div> <blockquote class="block-tip"> <p>#####Concept - Predicate A function or functor such that : <br>1. Returns a boolean <br>2. Does not modify date <br> Commonly used for comparison or condition check</p> </blockquote> <h2 id="reference">Reference</h2> <div class="footnotes" role="doc-endnotes"> <ol> <li id="fn:2" role="doc-endnote"> <p>[[[C++ Functors](https:\/\/www.programiz.com\/cpp-programming\/functors)]] <a href="#fnref:2" class="reversefootnote" role="doc-backlink">↩</a> <a href="#fnref:2:1" class="reversefootnote" role="doc-backlink">↩<sup>2</sup></a></p> </li> <li id="fn:3" role="doc-endnote"> <p>[[ [std::function](https:\/\/en.cppreference.com\/w\/cpp\/utility\/functional\/function)]] <a href="#fnref:3" class="reversefootnote" role="doc-backlink">↩</a> <a href="#fnref:3:1" class="reversefootnote" role="doc-backlink">↩<sup>2</sup></a></p> </li> </ol> </div> </body></html>
